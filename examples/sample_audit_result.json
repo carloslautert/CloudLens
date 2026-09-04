@@ -1,0 +1,16 @@
+{
+  "account_id": "000000000000",
+  "audit_date": "2026-09-04T12:00:00+00:00",
+  "regions": ["us-east-1"],
+  "scope": {"regions": 1, "ec2_instances": 1, "ebs_volumes": 1, "security_groups": 1, "elastic_ips": 0, "rds_instances": 0, "s3_buckets": 2, "iam_users": 1, "access_keys": 1, "cloudtrails": 1},
+  "total_findings": 3,
+  "by_severity": {"high": 2, "medium": 1},
+  "total_estimated_savings_brl": 32.0,
+  "findings": [
+    {"category":"security","severity":"high","title":"Public SSH access","resource_id":"sg-demo123","resource_type":"Security Group","region":"us-east-1","description":"TCP port 22 is reachable from the public internet.","recommendation":"Restrict the rule to approved networks or use AWS Systems Manager Session Manager where appropriate.","estimated_monthly_cost_brl":0.0,"extra":{"port":22}},
+    {"category":"security","severity":"high","title":"IAM console user without MFA","resource_id":"demo-user","resource_type":"IAM User","region":"global","description":"The IAM user has console access but no MFA device was found.","recommendation":"Enable MFA and review whether console access is still necessary.","estimated_monthly_cost_brl":0.0,"extra":{}},
+    {"category":"cost","severity":"medium","title":"Unattached EBS volume","resource_id":"vol-demo123","resource_type":"EBS Volume","region":"us-east-1","description":"The 80 GiB volume is not attached to an EC2 instance and may be generating avoidable cost.","recommendation":"Verify ownership and retention needs. Create a snapshot before deleting an unused volume.","estimated_monthly_cost_brl":32.0,"extra":{}}
+  ],
+  "errors": [],
+  "disclaimer": "Synthetic demo data only."
+}
