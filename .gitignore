@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Local configuration / credentials
+.env
+.env.*
+.aws/
+credentials
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Audit outputs may contain AWS account and resource identifiers
+output/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
