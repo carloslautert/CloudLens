@@ -2,120 +2,169 @@
 
 CloudLens is a **read-only AWS auditing project** focused on identifying security risks, governance gaps, unused resources, and cost-optimization opportunities across cloud environments.
 
-The project was built as a hands-on portfolio project to combine **AWS, information security, automation, risk analysis, and technical reporting**.
+It is a hands-on portfolio project combining **AWS, Information Security, automation, risk analysis, and technical reporting**.
 
-## Why CloudLens
+## What it does
 
-Cloud environments can grow quickly and accumulate issues such as:
+CloudLens inspects AWS configuration metadata and can flag issues such as:
 
-- overly permissive IAM access;
-- publicly exposed resources;
-- weak security-group rules;
-- missing logging or monitoring;
-- unused or underutilized resources;
-- unnecessary cloud spend;
-- inconsistent governance practices.
+- IAM console users without MFA
+- old IAM access keys
+- public SSH/RDP access in Security Groups
+- publicly accessible RDS instances
+- public S3 bucket policies
+- missing active CloudTrail logging
+- unattached EBS volumes
+- unassociated Elastic IPs
+- stopped or underutilized EC2 instances
 
-CloudLens structures these checks into a repeatable audit workflow and translates technical findings into clear remediation priorities.
-
-## Core capabilities
-
-- AWS environment inventory and audit
-- Security and governance checks
-- IAM and access-risk analysis
-- EC2 and Security Group review
-- S3 exposure and configuration review
-- EBS / resource-efficiency checks
-- Logging and monitoring visibility
-- Prioritized findings
-- Remediation recommendations
-- Estimated cost-saving opportunities
-- Business-friendly reporting
+It also produces a structured JSON result and can generate a simple HTML report with prioritized findings and remediation guidance.
 
 ## Security model
 
-CloudLens is designed around **least privilege and read-only access**.
+The project is designed around **least privilege and read-only access**.
 
-The intended access model uses:
+It supports:
 
-- AWS IAM Role
-- temporary credentials
-- restricted permissions
-- External ID concepts for cross-account access
-- no destructive actions
-- no modification of the audited environment
+- local AWS credentials for testing
+- cross-account access through an AWS IAM Role
+- temporary STS credentials
+- optional External ID
+- no create/update/delete AWS actions
+- configuration metadata inspection only
 
-The auditor is intended to inspect configuration metadata rather than application data.
+> Never commit AWS credentials, private keys or real client audit outputs to this repository.
 
-## High-level workflow
+## High-level flow
 
 ```text
 AWS Account
     ↓
-Read-only IAM Role
+Read-only IAM Role / local AWS profile
     ↓
 AWS APIs
     ↓
-Resource & Security Checks
+Security + Governance + Cost Checks
     ↓
-Risk / Cost Findings
+JSON Findings
     ↓
-Prioritization
-    ↓
-Remediation Guidance
-    ↓
-Audit Report
+HTML Report
 ```
+
+## Project structure
+
+```text
+CloudLens/
+├── audit.py
+├── generate_report.py
+├── requirements.txt
+├── examples/
+│   └── sample_audit_result.json
+└── README.md
+```
+
+## Quick start
+
+### 1. Create a virtual environment
+
+```bash
+python -m venv .venv
+```
+
+Activate it using the command appropriate for your operating system.
+
+### 2. Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Run an audit
+
+Using your local AWS credentials:
+
+```bash
+python audit.py --regions us-east-1 --output output/audit_result.json
+```
+
+Across available AWS regions:
+
+```bash
+python audit.py --regions all --output output/audit_result.json
+```
+
+Using a cross-account read-only role:
+
+```bash
+python audit.py \
+  --role-arn arn:aws:iam::ACCOUNT_ID:role/CloudLensAuditRole \
+  --external-id YOUR_EXTERNAL_ID \
+  --regions all \
+  --output output/audit_result.json
+```
+
+### 4. Generate the HTML report
+
+```bash
+python generate_report.py \
+  output/audit_result.json \
+  --company "Demo Company" \
+  --auditor-name "Carlos Henrique Braatz Lautert"
+```
+
+## Synthetic example
+
+A sanitized demo result is available at:
+
+`examples/sample_audit_result.json`
+
+It contains only fictitious identifiers and is safe to inspect publicly.
 
 ## Example finding
 
 ```text
-Finding: Security Group allows inbound SSH from 0.0.0.0/0
+Finding: Public SSH access
 Severity: High
 Service: EC2 / VPC
 
 Risk:
-The resource may be reachable from any public IP address.
+TCP port 22 is reachable from the public internet.
 
 Recommendation:
-Restrict port 22 access to approved administrative networks or use
-a managed access mechanism such as AWS Systems Manager Session Manager.
+Restrict the rule to approved administrative networks or use
+AWS Systems Manager Session Manager where appropriate.
 ```
 
 ## Technologies and concepts
 
 - Python
+- boto3
 - AWS APIs
-- IAM
+- IAM / STS
 - EC2
-- S3
 - EBS
 - Security Groups
+- S3
+- RDS
 - CloudTrail
 - CloudWatch
-- cloud security fundamentals
 - least privilege
+- cloud security fundamentals
 - risk assessment
-- security findings
+- technical reporting
 - cost optimization
-- technical documentation
 
-## What I learned
+## Important limitations
 
-Building CloudLens helped me practice how to:
+CloudLens is a **portfolio / learning project**. It is not a replacement for:
 
-- convert security concepts into automated checks;
-- reason about AWS permissions and least privilege;
-- identify and prioritize cloud risks;
-- organize technical findings for decision-making;
-- connect security recommendations with operational and cost impact;
-- communicate technical issues in a concise, business-friendly format.
+- a formal ISO 27001 audit
+- a compliance assessment
+- a penetration test
+- a CSPM / CNAPP production platform
+- AWS Security Hub or other enterprise security tooling
 
-## Project status
-
-CloudLens is a **portfolio / learning project** and should not be treated as a replacement for a complete production cloud-security platform or formal compliance audit.
-
-The project continues to evolve as I deepen my studies in **Cloud, Information Security, DevOps, automation, and governance**.
+Cost estimates are illustrative and should be validated against current AWS pricing before decisions are made.
 
 ## Author
 
